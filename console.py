@@ -4,10 +4,32 @@
 Module: console
 
 Description:
-This is a module that features the HBNBCommand class. The HBNBCommand opens
-a command line interpreter which prompts the user of this program for a
-command. For each command, use the `help` command to list them and how they
-are used.
+This is a module contains the HBNBCommand class which implements a command-line
+interface (CLI) for an AirBnB clone application. The CLI allows users to
+interact with the application by entering commands through the console.
+
+Usage:
+To use this module, execute the script directly. The script will invoke a
+command-line interface with the prompt '(hbnb)'. Enter commands to
+interact with the application. For each command use, `help` will display
+the neccessary information about it.
+
+Example:
+example@user:/AirBnB_clone$ ./console.py
+(hbnb)
+(hbnb) help
+
+Documented commands (type help <topic>):
+========================================
+EOF  help  quit
+
+(hbnb)
+(hbnb)
+(hbnb) help quit
+Quit command to exit the console
+
+(hbnb)
+(hbnb)
 """
 import cmd
 
