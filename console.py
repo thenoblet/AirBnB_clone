@@ -52,6 +52,8 @@ class HBNBCommand(cmd.Cmd):
     do_EOF(self, args): Command that exits the console (Ctrl+D).
     help_EOF(self): Provides information about the EOF command.
     emptyline(self): Upon encountering blank line + `Enter` key, does nothing.
+    precmd(self, line): Preprocesses each command line before execution.
+    do_help(self, args): Custom handling for the help command.
     """
     prompt = '(hbnb) '
 
@@ -101,7 +103,7 @@ class HBNBCommand(cmd.Cmd):
         else:
             return line.upper()
 
-    def do_help(self, arg):
+    def do_help(self, args):
         """
         This method provides custom handling for the help command. If the
         argument is 'EOF', it displays help information specific to the 'EOF'
@@ -109,10 +111,10 @@ class HBNBCommand(cmd.Cmd):
         base class's `do_help` method after converting the argument to
         lowercase.
         """
-        if arg.upper() == "EOF":
+        if args.upper() == "EOF":
             self.help_EOF()
         else:
-            super().do_help(arg.lower())
+            super().do_help(args.lower())
 
 
 if __name__ == '__main__':
