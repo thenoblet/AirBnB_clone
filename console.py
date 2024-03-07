@@ -54,6 +54,7 @@ class HBNBCommand(cmd.Cmd):
     emptyline(self): Upon encountering blank line + `Enter` key, does nothing.
     precmd(self, line): Preprocesses each command line before execution.
     do_help(self, args): Custom handling for the help command.
+    help_help(self): Provides information about the help command.
     """
     prompt = '(hbnb) '
 
@@ -115,6 +116,19 @@ class HBNBCommand(cmd.Cmd):
             self.help_EOF()
         else:
             super().do_help(args.lower())
+
+    def help_help(self):
+        """
+        Provides information about the help command.
+
+        This method explains the usage of the help command in the console.
+        It informs users how to list available commands and how to obtain
+        detailed help for a specific command using the 'help' command.
+
+        """
+        print("To list available commands, type 'help'.")
+        print("\nTo get detailed help for a specific command, type 'help' \
+followed by the command name.")
 
 
 if __name__ == '__main__':
