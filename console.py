@@ -88,6 +88,32 @@ class HBNBCommand(cmd.Cmd):
         """
         pass
 
+    def precmd(self, line):
+        """
+        Preprocesses each command line before execution.
+
+        Converts the command to lowercase it is a valid command but not 'EOF',
+        converts it to uppercase if the command is the 'EOF' command whatever
+        letter case regardless.
+        """
+        if line.strip().lower() != 'eof':
+            return line.lower()
+        else:
+            return line.upper()
+
+    def do_help(self, arg):
+        """
+        This method provides custom handling for the help command. If the
+        argument is 'EOF', it displays help information specific to the 'EOF'
+        command using the `help_EOF` method. Otherwise, it delegates to the
+        base class's `do_help` method after converting the argument to
+        lowercase.
+        """
+        if arg.upper() == "EOF":
+            self.help_EOF()
+        else:
+            super().do_help(arg.lower())
+
 
 if __name__ == '__main__':
     HBNBCommand().cmdloop()
