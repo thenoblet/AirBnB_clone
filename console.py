@@ -29,7 +29,8 @@ EOF  help  quit
 Quit command to exit the console
 
 (hbnb)
-(hbnb)
+(hbnb) quit
+example@user:/AirBnB_clone$
 """
 import cmd
 
