@@ -63,6 +63,9 @@ class HBNBCommand(cmd.Cmd):
     help_create(self): Provides information about the create command.
     """
     prompt = '(hbnb) '
+    class_mapping = {
+            'BaseModel': BaseModel
+            }
 
     def do_quit(self, args):
         """
