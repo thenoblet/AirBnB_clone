@@ -42,19 +42,29 @@ class BaseModel:
         - __str__(): returns a string representation of the instance
     """
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         """
         Constructor for the BaseModel class.
 
-        Parameters:
-        - id (str): Unique identifier generated using uuid4.
-        - created_at (datetime): The timestamp representing the creation time.
-        - updated_at (datetime): The timestamp representing the
-          last update time.
+        Args:
+        - *args: Unused
+        - **kwargs: Dictionary containing attribute names and values.
         """
-        self.id = str(uuid4())
-        self.created_at = datetime.now()
-        self.updated_at = self.created_at
+        if kwargs:
+            # Populate attributes from dictionary representation
+            for key, value in kwargs.items():
+                if key == "created_at" or key == "updated_at":
+                    # Convert datetime strings to datetime objects
+                    setattr(
+                            self, key, datetime.strptime(
+                                value, '%Y-%m-%dT%H:%M:%S.%f'))
+                elif key != "__class__":
+                    setattr(self, key, value)
+        else:
+            # Create new instance with unique id and created_at
+            self.id = str(uuid4())
+            self.created_at = datetime.now()
+            self.updated_at = self.created_at
 
     def __str__(self):
         """
@@ -73,6 +83,12 @@ class BaseModel:
         self.updated_at = datetime.now()
 
     def to_dict(self):
+        """
+        Convert the BaseModel instance to a dictionary.
+
+        Returns:
+        dict: A dictionary representation of the BaseModel instance.
+        """
         model_dict = self.__dict__.copy()
 
         model_dict["__class__"] = self.__class__.__name__
