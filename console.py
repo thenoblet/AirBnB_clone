@@ -33,6 +33,8 @@ Quit command to exit the console
 example@user:/AirBnB_clone$
 """
 import cmd
+import uuid
+from models.base_model import BaseModel
 
 
 class HBNBCommand(cmd.Cmd):
@@ -45,6 +47,8 @@ class HBNBCommand(cmd.Cmd):
 
     Attributes:
     - prompt (str): Custom prompt for the command-line interface.
+    - class_mapping (dict): Dictionary mapping class names to their
+    corresponding classes.
 
     Methods:
     do_quit(self, args): Command that exits or quits the console.
@@ -55,6 +59,8 @@ class HBNBCommand(cmd.Cmd):
     precmd(self, line): Preprocesses each command line before execution.
     do_help(self, args): Custom handling for the help command.
     help_help(self): Provides information about the help command.
+    do_create(self, args): Creates a new instance of a specified class.
+    help_create(self): Provides information about the create command.
     """
     prompt = '(hbnb) '
 
@@ -128,7 +134,32 @@ class HBNBCommand(cmd.Cmd):
         """
         print("To list available commands, type 'help'.")
         print("\nTo get detailed help for a specific command, type 'help' \
-followed by the command name.")
+followed by the command name.\n")
+
+    def do_create(self, args):
+        """
+        Creates a new instance of a specified class.
+
+        Usage: create <class_name>
+        """
+        if not args:
+            print("** class name missing **")
+            return
+
+        class_name = args.split()[0]
+        try:
+            new_instance = eval(class_name)()
+            new_instance.save()
+            print(new_instance.id)
+        except NameError:
+            print("** class doesn't exist **")
+
+    def help_create(self):
+        """
+        Provides information about the create command.
+        """
+        print("Creates a new instance of a specified class.\n")
+        print("Usage: create <class_name>\n")
 
 
 if __name__ == '__main__':
