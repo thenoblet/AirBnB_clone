@@ -150,12 +150,12 @@ followed by the command name.\n")
             return
 
         class_name = args.split()[0]
-        try:
-            new_instance = eval(class_name)()
-            new_instance.save()
-            print(new_instance.id)
-        except NameError:
-            print("** class doesn't exist **")
+        if class_name not in self.class_mapping:
+            print('** class doesn\'t exist **')
+            return
+        new_instance = self.class_mapping[class_name]()
+        new_instance.save()
+        print(new_instance.id)
 
     def help_create(self):
         """
