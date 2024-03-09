@@ -253,6 +253,20 @@ on the class name.\n")
 
     def do_update(self, args):
         """
+        Updates an instance attribute based on class name and id.
+
+        Usage: update <class_name> <instance_id> <attribute_name> "<attribute_value>"
+
+        This command updates an attribute of an instance specified by its class name
+        and id. It requires the class name, instance id, attribute name, and the new
+        attribute value enclosed in double quotes.
+        
+        - If class name or instance id is missing, prints respective error message.
+        - If the instance for the class name and instance id doesn't exist, prints an
+        error message.
+        - If the attribute name or value is missing, prints respective error message.
+        - Only simple arguments (string, integer, float) can be updated.
+        - Attributes 'id', 'created_at', and 'updated_at' cannot be updated.
         """
         if not args:
             print("** class name missing **")
