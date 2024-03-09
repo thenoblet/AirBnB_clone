@@ -24,6 +24,7 @@ Usage:
 
 from uuid import uuid4
 from datetime import datetime
+import models
 
 
 class BaseModel:
@@ -53,7 +54,7 @@ class BaseModel:
         if kwargs:
             # Populate attributes from dictionary representation
             for key, value in kwargs.items():
-                if key == "created_at" or key == "updated_at":
+                if key in ["created_at", "updated_at"]:
                     # Convert datetime strings to datetime objects
                     setattr(
                             self, key, datetime.strptime(
@@ -65,6 +66,7 @@ class BaseModel:
             self.id = str(uuid4())
             self.created_at = datetime.now()
             self.updated_at = self.created_at
+            models.storage.new(self)
 
     def __str__(self):
         """
@@ -81,6 +83,8 @@ class BaseModel:
         Update the 'updated_at' attribute to the current timestamp.
         """
         self.updated_at = datetime.now()
+
+        models.storage.save()
 
     def to_dict(self):
         """
