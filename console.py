@@ -61,6 +61,17 @@ class HBNBCommand(cmd.Cmd):
     help_help(self): Provides information about the help command.
     do_create(self, args): Creates a new instance of a specified class.
     help_create(self): Provides information about the create command.
+    do_show(self, args): Prints the string representation of an instance
+    based on the class name and id.
+    help_show(self): Provides information about eht show command.
+    do_destroy(self, args): Deletes an instance based on class name and id.
+    (save the change into the JSON file).
+    help_destroy(self): Provides information about the destroy command.
+    do_all(self, args): Prints all string representation of all instances based
+    or not on the class name.
+    help_all(self): Provides information about the all command.
+    do_update(self, args): Updates an instance based on the class name and id.
+    help_update(self): Displays information about the update command.
     """
     prompt = '(hbnb) '
     class_mapping = {
@@ -163,6 +174,174 @@ followed by the command name.\n")
         """
         print("Creates a new instance of a specified class.\n")
         print("Usage: create <class_name>\n")
+
+    def do_show(self, args):
+        """
+        Prints the string representation of an instance based on the class
+        name and id.
+
+        Usage: show <class_name> <instance_id>
+        """
+        if not args:
+            print("** class name missing **")
+            return
+
+        args_list = args.split()
+        if args_list[0] not in self.class_mapping:
+            print('** class doesn\'t exist **')
+            return
+
+        if len(args_list) == 1:
+            print("** instance id missing **")
+            return
+
+        key = args_list[0] + "." + args_list[1]
+        objects = storage.all()
+
+        if key not in objects:
+            print("** no instance found **")
+            return
+
+        print(objects[key])
+
+    def help_show(self):
+        """
+        Provides information about the show command.
+        """
+        print("Prints the string representation of an instance based on the\
+class name and id.\n")
+        print("Usage: show <class_name> <instance_id>\n")
+
+    def do_destroy(self, args):
+        """
+        Deletes an instance based on the class name and id.
+
+        Usage: destroy <class_name> <instance_id>
+        """
+        if not args:
+            print("** class name missing **")
+            return
+
+        args_list = args.split()
+        if args_list[0] not in self.class_mapping:
+            print('** class doesn\'t exist **')
+            return
+
+        if len(args_list) == 1:
+            print("** instance id missing **")
+            return
+
+        key = args_list[0] + "." + args_list[1]
+        objects = storage.all()
+
+        if key not in objects:
+            print("** no instance found **")
+            return
+
+        del objects[key]
+        storage.save()
+
+    def help_destroy(self):
+        """
+        Provides information about the destroy command.
+        """
+        print("Deletes an instance based on the class name and id.\n")
+        print("Usage: destroy <class_name> <instance_id>\n")
+
+    def do_all(self, args):
+        """
+        Prints all string representation of all instances based or not on the
+        class name.
+
+        Usage: all <class_name>
+        """
+        objects = storage.all()
+        if not args:
+            print([str(obj) for obj in objects.values()])
+            return
+
+        class_name = args.split()[0]
+        if class_name not in self.class_mapping:
+            print('** class doesn\'t exist **')
+            return
+
+        print([str(obj) for key, obj in objects.items() if key.split('.')[0]
+              == class_name])
+
+    def help_all(self):
+        """
+        Provides information about the all command.
+        """
+        print("Prints all string representation of all instances based or not\
+on the class name.\n")
+        print("Usage: all <class_name>\n")
+
+    def do_update(self, args):
+        """
+        """
+        if not args:
+            print("** class name missing **")
+            return
+
+        args_list = args.split()
+        if args_list[0] not in self.class_mapping:
+            print('** class doesn\'t exist **')
+            return
+
+        if len(args_list) == 1:
+            print("** instance id missing **")
+            return
+
+        if len(args_list) == 2:
+            print("** attribute name missing **")
+            return
+
+        if len(args_list) == 3:
+            print("** value missing **")
+            return
+
+        key = args_list[0] + "." + args_list[1]
+        objects = storage.all()
+
+        if key not in objects:
+            print("** no instance found **")
+            return
+
+        instance = objects[key]
+        attribute_name = args_list[2]
+        attribute_value = args_list[3].strip('"')
+
+        if hasattr(instance, attribute_name):
+            attribute_type = type(getattr(instance, attribute_name))
+            try:
+                setattr(instance, attribute_name,
+                        attribute_type(attribute_value))
+            except (ValueError, TypeError):
+                print("** value missing **")
+                return
+            instance.save()
+        else:
+            print("** attribute doesn't exist **")
+
+    def help_update(self):
+        """
+        Provides information about the update command.
+        Usage: update <class name> <id> <attribute name> "<attribute value>"
+
+        - Updates an instance attribute based on class name and id.
+        - Only one attribute can be updated at a time.
+        - The attribute name must be valid for the model.
+        - The attribute value must be of the correct type.
+        - If class name or id is missing, prints respective error message.
+        - If instance for class name and id doesn't exist, prints error
+        message.
+        - If attribute name or value is missing, prints respective error
+        message.
+        - Only simple arguments (string, integer, float) can be updated.
+        - id, created_at, and updated_at cannot be updated.
+        """
+        print("Updates an instance's attribute based on class name and id.\n\
+\nUsage: update <class name> <id> <attribute name> <attribute value>.\n")
 
 
 if __name__ == '__main__':
