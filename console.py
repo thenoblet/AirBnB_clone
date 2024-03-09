@@ -255,62 +255,41 @@ on the class name.\n")
         """
         Updates an instance attribute based on class name and id.
 
-        Usage: update <class_name> <instance_id> <attribute_name> "<attribute_value>"
+        Usage: update <class_name> <instance_id> <attribute_name>
+        "<attribute_value>"
 
-        This command updates an attribute of an instance specified by its class name
-        and id. It requires the class name, instance id, attribute name, and the new
-        attribute value enclosed in double quotes.
-        
-        - If class name or instance id is missing, prints respective error message.
-        - If the instance for the class name and instance id doesn't exist, prints an
+        This command updates an attribute of an instance specified by its class
+        name and id. It requires the class name, instance id, attribute name,
+        and the new attribute value enclosed in double quotes.
+        - If class name or instance id is missing, prints respective error
+        message.
+        - If the instance for the class name and instance id doesn't exist,
+        prints an error message.
+        - If the attribute name or value is missing, prints respective
         error message.
-        - If the attribute name or value is missing, prints respective error message.
         - Only simple arguments (string, integer, float) can be updated.
         - Attributes 'id', 'created_at', and 'updated_at' cannot be updated.
         """
+        arg = args.split()
         if not args:
             print("** class name missing **")
-            return
-
-        args_list = args.split()
-        if args_list[0] not in self.class_mapping:
-            print('** class doesn\'t exist **')
-            return
-
-        if len(args_list) == 1:
+        elif arg[0] not in self.class_mapping:
+            print("** class doesn't exist **")
+        elif len(arg) < 2:
             print("** instance id missing **")
-            return
-
-        if len(args_list) == 2:
+        elif len(arg) < 3:
             print("** attribute name missing **")
-            return
-
-        if len(args_list) == 3:
+        elif len(arg) < 4:
             print("** value missing **")
-            return
-
-        key = args_list[0] + "." + args_list[1]
-        objects = storage.all()
-
-        if key not in objects:
-            print("** no instance found **")
-            return
-
-        instance = objects[key]
-        attribute_name = args_list[2]
-        attribute_value = args_list[3].strip('"')
-
-        if hasattr(instance, attribute_name):
-            attribute_type = type(getattr(instance, attribute_name))
-            try:
-                setattr(instance, attribute_name,
-                        attribute_type(attribute_value))
-            except (ValueError, TypeError):
-                print("** value missing **")
-                return
-            instance.save()
         else:
-            print("** attribute doesn't exist **")
+            _object = storage.all()
+            key = "{}.{}".format(arg[0], arg[1])
+            if key not in _object:
+                print("** no instance found **")
+                return
+            instance = _object[key]
+            setattr(instance, arg[2], arg[3])
+            instance.save()
 
     def help_update(self):
         """
