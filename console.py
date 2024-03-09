@@ -35,6 +35,7 @@ example@user:/AirBnB_clone$
 import cmd
 import uuid
 from models.base_model import BaseModel
+from models import storage
 
 
 class HBNBCommand(cmd.Cmd):
@@ -110,32 +111,6 @@ class HBNBCommand(cmd.Cmd):
         Upon encountering a blank line + `Enter`, do nothing
         """
         pass
-
-    def precmd(self, line):
-        """
-        Preprocesses each command line before execution.
-
-        Converts the command to lowercase it is a valid command but not 'EOF',
-        converts it to uppercase if the command is the 'EOF' command whatever
-        letter case regardless.
-        """
-        if line.strip().lower() != 'eof':
-            return line.lower()
-        else:
-            return line.upper()
-
-    def do_help(self, args):
-        """
-        This method provides custom handling for the help command. If the
-        argument is 'EOF', it displays help information specific to the 'EOF'
-        command using the `help_EOF` method. Otherwise, it delegates to the
-        base class's `do_help` method after converting the argument to
-        lowercase.
-        """
-        if args.upper() == "EOF":
-            self.help_EOF()
-        else:
-            super().do_help(args.lower())
 
     def help_help(self):
         """
