@@ -36,11 +36,11 @@ import cmd
 import uuid
 from models.base_model import BaseModel
 from models import storage
-from models import User
-from models import State
-from models import City
-from models import Amenity
-from models import Review
+from models.user import User
+from models.state import State
+from models.city import City
+from models.amenity import Amenity
+from models.review import Review
 
 
 class HBNBCommand(cmd.Cmd):
@@ -87,7 +87,7 @@ class HBNBCommand(cmd.Cmd):
             'City': City,
             'Amenity': Amenity,
             'Place': Place,
-            'Review': Review
+            'Review': Review,
             }
 
     def do_quit(self, args):
