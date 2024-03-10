@@ -36,6 +36,11 @@ import cmd
 import uuid
 from models.base_model import BaseModel
 from models import storage
+from models import User
+from models import State
+from models import City
+from models import Amenity
+from models import Review
 
 
 class HBNBCommand(cmd.Cmd):
@@ -76,7 +81,13 @@ class HBNBCommand(cmd.Cmd):
     """
     prompt = '(hbnb) '
     class_mapping = {
-            'BaseModel': BaseModel
+            'BaseModel': BaseModel,
+            'User': User,
+            'State': State,
+            'City': City,
+            'Amenity': Amenity,
+            'Place': Place,
+            'Review': Review
             }
 
     def do_quit(self, args):
