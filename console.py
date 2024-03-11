@@ -32,14 +32,17 @@ Quit command to exit the console
 (hbnb) quit
 example@user:/AirBnB_clone$
 """
+
 import cmd
-import uuid
-from models.base_model import BaseModel
+import json
+import shlex
 from models import storage
+from models.engine.file_storage import FileStorage
+from models.base_model import BaseModel
 from models.user import User
+from models.place import Place
 from models.state import State
 from models.city import City
-from models.place import Place
 from models.amenity import Amenity
 from models.review import Review
 
@@ -80,7 +83,8 @@ class HBNBCommand(cmd.Cmd):
     do_update(self, args): Updates an instance based on the class name and id.
     help_update(self): Displays information about the update command.
     """
-    prompt = '(hbnb) '
+
+    prompt = ("(hbnb) ")
     class_mapping = {
             'BaseModel': BaseModel,
             'User': User,
@@ -92,68 +96,33 @@ class HBNBCommand(cmd.Cmd):
             }
 
     def do_quit(self, args):
-        """
-        Quit command to exit the console.
-
-        Usage: quit
-        """
+        '''
+            Quit command to exit the program.
+        '''
         return True
-
-    def help_quit(self):
-        """
-        Provides information about the quit command.
-        """
-        print("Quit command to exit the console\n")
 
     def do_EOF(self, args):
-        """
-        End of file command (Ctrl+D) that exits the console.
-        """
-        print()
+        '''
+            Exits after receiving the EOF signal.
+        '''
         return True
 
-    def help_EOF(self):
-        """
-        Provides information about the EOF command
-        """
-        print("Press `Ctrl+D` to exit the console\n")
-
-    def emptyline(self):
-        """
-        Upon encountering a blank line + `Enter`, do nothing
-        """
-        pass
-
-    def help_help(self):
-        """
-        Provides information about the help command.
-
-        This method explains the usage of the help command in the console.
-        It informs users how to list available commands and how to obtain
-        detailed help for a specific command using the 'help' command.
-
-        """
-        print("To list available commands, type 'help'.")
-        print("\nTo get detailed help for a specific command, type 'help' \
-followed by the command name.\n")
-
     def do_create(self, args):
-        """
-        Creates a new instance of a specified class.
-
-        Usage: create <class_name>
-        """
-        if not args:
+        '''
+            Create a new instance of class BaseModel and saves it
+            to the JSON file.
+        '''
+        if len(args) == 0:
             print("** class name missing **")
             return
+        try:
+            args = shlex.split(args)
+            new_instance = eval(args[0])()
+            new_instance.save()
+            print(new_instance.id)
 
-        class_name = args.split()[0]
-        if class_name not in self.class_mapping:
-            print('** class doesn\'t exist **')
-            return
-        new_instance = self.class_mapping[class_name]()
-        new_instance.save()
-        print(new_instance.id)
+        except NameError:
+            print("** class doesn't exist **")
 
     def help_create(self):
         """
@@ -163,33 +132,32 @@ followed by the command name.\n")
         print("Usage: create <class_name>\n")
 
     def do_show(self, args):
-        """
-        Prints the string representation of an instance based on the class
-        name and id.
-
-        Usage: show <class_name> <instance_id>
-        """
-        if not args:
+        '''
+            Print the string representation of an instance baed on
+            the class name and id given as args.
+        '''
+        args = shlex.split(args)
+        if len(args) == 0:
             print("** class name missing **")
             return
-
-        args_list = args.split()
-        if args_list[0] not in self.class_mapping:
-            print('** class doesn\'t exist **')
-            return
-
-        if len(args_list) == 1:
+        if len(args) == 1:
             print("** instance id missing **")
             return
-
-        key = args_list[0] + "." + args_list[1]
-        objects = storage.all()
-
-        if key not in objects:
-            print("** no instance found **")
+        storage = FileStorage()
+        storage.reload()
+        obj_dict = storage.all()
+        try:
+            eval(args[0])
+        except NameError:
+            print("** class doesn't exist **")
             return
-
-        print(objects[key])
+        key = args[0] + "." + args[1]
+        key = args[0] + "." + args[1]
+        try:
+            value = obj_dict[key]
+            print(value)
+        except KeyError:
+            print("** no instance found **")
 
     def help_show(self):
         """
@@ -200,32 +168,31 @@ class name and id.\n")
         print("Usage: show <class_name> <instance_id>\n")
 
     def do_destroy(self, args):
-        """
-        Deletes an instance based on the class name and id.
-
-        Usage: destroy <class_name> <instance_id>
-        """
-        if not args:
+        '''
+            Deletes an instance based on the class name and id.
+        '''
+        args = shlex.split(args)
+        if len(args) == 0:
             print("** class name missing **")
             return
-
-        args_list = args.split()
-        if args_list[0] not in self.class_mapping:
-            print('** class doesn\'t exist **')
-            return
-
-        if len(args_list) == 1:
+        elif len(args) == 1:
             print("** instance id missing **")
             return
-
-        key = args_list[0] + "." + args_list[1]
-        objects = storage.all()
-
-        if key not in objects:
-            print("** no instance found **")
+        class_name = args[0]
+        class_id = args[1]
+        storage = FileStorage()
+        storage.reload()
+        obj_dict = storage.all()
+        try:
+            eval(class_name)
+        except NameError:
+            print("** class doesn't exist **")
             return
-
-        del objects[key]
+        key = class_name + "." + class_id
+        try:
+            del obj_dict[key]
+        except KeyError:
+            print("** no instance found **")
         storage.save()
 
     def help_destroy(self):
@@ -282,26 +249,40 @@ on the class name.\n")
         - Only simple arguments (string, integer, float) can be updated.
         - Attributes 'id', 'created_at', and 'updated_at' cannot be updated.
         """
-        arg = args.split()
-        if not args:
+        storage = FileStorage()
+        storage.reload()
+        args = shlex.split(args)
+        if len(args) == 0:
             print("** class name missing **")
-        elif arg[0] not in self.class_mapping:
-            print("** class doesn't exist **")
-        elif len(arg) < 2:
+            return
+        elif len(args) == 1:
             print("** instance id missing **")
-        elif len(arg) < 3:
+            return
+        elif len(args) == 2:
             print("** attribute name missing **")
-        elif len(arg) < 4:
+            return
+        elif len(args) == 3:
             print("** value missing **")
-        else:
-            _object = storage.all()
-            key = "{}.{}".format(arg[0], arg[1])
-            if key not in _object:
-                print("** no instance found **")
-                return
-            instance = _object[key]
-            setattr(instance, arg[2], arg[3])
-            instance.save()
+            return
+        try:
+            eval(args[0])
+        except NameError:
+            print("** class doesn't exist **")
+            return
+        key = args[0] + "." + args[1]
+        obj_dict = storage.all()
+        try:
+            obj_value = obj_dict[key]
+        except KeyError:
+            print("** no instance found **")
+            return
+        try:
+            attr_type = type(getattr(obj_value, args[2]))
+            args[3] = attr_type(args[3])
+        except AttributeError:
+            pass
+        setattr(obj_value, args[2], args[3])
+        obj_value.save()
 
     def help_update(self):
         """
@@ -323,6 +304,54 @@ on the class name.\n")
         print("Updates an instance's attribute based on class name and id.\n\
 \nUsage: update <class name> <id> <attribute name> <attribute value>.\n")
 
+    def emptyline(self):
+        '''
+            Prevents printing anything when an empty line is passed.
+        '''
+        pass
 
-if __name__ == '__main__':
+    def do_count(self, args):
+        '''
+            Counts/retrieves the number of instances.
+        '''
+        obj_list = []
+        storage = FileStorage()
+        storage.reload()
+        objects = storage.all()
+        try:
+            if len(args) != 0:
+                eval(args)
+        except NameError:
+            print("** class doesn't exist **")
+            return
+        for key, val in objects.items():
+            if len(args) != 0:
+                if type(val) is eval(args):
+                    obj_list.append(val)
+            else:
+                obj_list.append(val)
+        print(len(obj_list))
+
+    def default(self, args):
+        '''
+            Catches all the function names that are not expicitly defined.
+        '''
+        functions = {"all": self.do_all, "update": self.do_update,
+                     "show": self.do_show, "count": self.do_count,
+                     "destroy": self.do_destroy, "update": self.do_update}
+        args = (args.replace("(", ".").replace(")", ".")
+                .replace('"', "").replace(",", "").split("."))
+
+        try:
+            cmd_arg = args[0] + " " + args[2]
+            func = functions[args[1]]
+            func(cmd_arg)
+        except KeyError:
+            print("*** Unknown syntax:", args[0])
+
+
+if __name__ == "__main__":
+    '''
+        Entry point for the loop.
+    '''
     HBNBCommand().cmdloop()
